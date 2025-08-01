@@ -1,0 +1,10 @@
+export const UNLOCK_BUY_BUTTON = true
+export const UNLOCK_TOKEN_LOCKED = true
+export const UNLOCK_CETUS = true
+export const UNLOCK_HEATMAP = true
+export const UNLOCK_GIF = true
+export const LOCK_LINK = ''
+export const UNLOCK_TRACK_WALLET = true
+export const UNLOCK_TOP_HOLDERS = true
+export const UNLOCK_HEATMAP_SUI = true
+export const UNLOCK_SWAP = false

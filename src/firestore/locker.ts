@@ -1,0 +1,79 @@
+import admin from 'firebase-admin'
+import { beraDb } from '.'
+
+const collection = 'locker'
+
+const upsert = async (token: any) => {
+  const { id } = token
+
+  return await beraDb
+    .collection(collection)
+    .doc(id)
+    .set({
+      ...token,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    })
+}
+
+const getAll = async () => {
+  const snapshot = await beraDb.collection(collection).get()
+
+  const tokens: any[] = []
+  snapshot.forEach((doc) => {
+    tokens.push(doc.data() as any)
+  })
+
+  return tokens
+}
+
+const getAllByReceipt = async (address: string) => {
+  const snapshot = await beraDb
+    .collection(collection)
+    .where('recipient', '==', address)
+    .get()
+
+  const tokens: any[] = []
+  snapshot.forEach((doc) => {
+    tokens.push(doc.data() as any)
+  })
+
+  return tokens
+}
+
+const remove = async (id: string) => {
+  await beraDb.collection(collection).doc(id).delete()
+
+  return id
+}
+
+const batchUpsert = async (tokens: any) => {
+  const batch = beraDb.batch()
+  tokens.forEach((item: any, index: any) => {
+    const itemRef = beraDb.collection(collection).doc(item.address)
+    batch.set(itemRef, { ...item }, { merge: true })
+  })
+
+  await batch.commit()
+}
+
+const batchRemove = async (tokens: any) => {
+  const batch = beraDb.batch()
+
+  tokens.forEach((item: any) => {
+    const itemRef = beraDb.collection(collection).doc(item.address)
+    batch.delete(itemRef)
+  })
+
+  await batch.commit()
+}
+
+const fsLocker = {
+  upsert,
+  getAll,
+  batchUpsert,
+  batchRemove,
+  remove,
+  getAllByReceipt,
+}
+
+export default fsLocker
